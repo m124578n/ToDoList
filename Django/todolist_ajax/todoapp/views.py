@@ -1,14 +1,19 @@
 from django.shortcuts import render, redirect
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from django.forms.models import model_to_dict
 from .models import Todo
 import json
 
 # Create your views here.
 
 def index(request):
+    return render(request, 'base.html')
+
+
+def api(request):
     todos = Todo.objects.all()
-    return render(request, 'base.html', {"todo_list": todos})
+    return JsonResponse({"data":list(todos.values())})
 
 
 @require_http_methods(["POST"])
