@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">To Do App</h1>
+
+        <form class="ui form">
+            {% csrf_token %}
+            <div class="field">
+                <label>Todo Title</label>
+                <input type="text" name="title" id="title" placeholder="Enter Todo..." value=""><br>
+            </div>
+            <button class="ui blue button" type="button" onclick=add()>Add</button>
+        </form>
+
+        <hr>
+        <div id="all">
+            {% for todo in todo_list %}
+            <div id="all_todo{{ todo.id }}">
+                <div class="ui segment">
+                    <p class="ui big header">{{ todo.id }} | {{ todo.title }}</p>
+
+                    {% if todo.complete == False %}
+                    <span class="ui gray label" id="todo{{todo.id}}">Not Complete</span>
+                    {% else %}
+                    <span class="ui green label" id="todo{{todo.id}}">Completed</span>
+                    {% endif %}
+
+                    <a class="ui blue button" onclick=update_("{{ todo.id }}")>Update</a>
+                    <a class="ui red button" onclick=delete_("{{ todo.id }}")>Delete</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <script>
+            function add(){
+                title = document.querySelector("#title").value
+                data = {
+                    "title": title
+                }
+                fetch("/add/", {
+                    headers: { 
+                        "X-CSRFToken": "{{csrf_token}}",
+                        "user-agent": "Mozilla/4.0 MDN Example",
+                        "content-type": "application/json", 
+                    },
+                    method: "POST", 
+                    body: JSON.stringify(data),
+                })
+                .then(function (response){
+                return response.json()
+                })
+                .then(function (myJson){
+                    todo_id = myJson["todo_id"]
+                    complete = myJson["complete"]
+                    title = myJson["todo_title"]
+                    html = ""
+                    html += '<div id="all_todo'+todo_id+'"> <div class="ui segment"> '
+                    html += '<p class="ui big header">'+todo_id+' | '+title+'</p> '
+                    html += '<span class="ui gray label" id="todo'+todo_id+'">Not Complete</span> '
+                    html += '<a class="ui blue button" onclick=update_("'+todo_id+'")>Update</a> '
+                    html += '<a class="ui red button" onclick=delete_("'+todo_id+'")>Delete</a> </div></div>'
+                    document.querySelector("#all").innerHTML += html
+                })
+            }
+
+            function update_(todo_id){
+                fetch("/update/"+todo_id)
+                .then(function (response){
+                return response.json()
+                })
+                .then(function (myJson) {
+                    todo_id = myJson["todo_id"]
+                    complete = myJson["complete"]
+                    ctodo_id = document.querySelector("#todo"+todo_id)
+                    if (complete){
+                        ctodo_id.classList.remove("gray")
+                        ctodo_id.classList.add("green")
+                    }
+                    else{
+                        ctodo_id.classList.remove("green")
+                        ctodo_id.classList.add("gray")
+                    }
+                })
+            }
+
+            function delete_(todo_id){
+                fetch("/delete/"+todo_id)
+                .then(function (response){
+                return response.json()
+                })
+                .then(function (myJson) {
+                    todo_id = myJson["todo_id"]
+                    document.querySelector("#all_todo"+todo_id).innerHTML = ""
+                })
+            }
+        </script>
+    </div>
+</body>
+
+</html>
