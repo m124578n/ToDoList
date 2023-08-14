@@ -19,7 +19,7 @@
         <form class="ui form">
             <div class="field">
                 <label>Todo Title</label>
-                <input type="text" name="title" id="title" placeholder="Enter Todo..." value=""><br>
+                <input name="title" id="title" placeholder="Enter Todo..." value=""><br>
             </div>
             <button class="ui blue button" type="button" onclick=add()>Add</button>
         </form>
@@ -29,6 +29,18 @@
         </div>
 
         <script>
+            document.onkeydown = form_sumbit
+
+            function form_sumbit(e){
+                the_event = e || window.event
+                code = the_event.keyCode || the_event.which || the_event.charCode
+                if (code == 13){
+                    add()
+                    return false
+                }
+                return true
+            }
+
             function get_all_list(){
                 fetch("/api/")
                 .then(function (response){
@@ -36,7 +48,6 @@
                 })
                 .then(function (myJosn){
                     data = myJosn["data"]
-                    console.log(data)
                     data.forEach(todo => {
                         html = ""
                         html += '<div id="all_todo'+todo.id+'"> <div class="ui segment"> '
@@ -59,7 +70,7 @@
                 data = {
                     "title": title
                 }
-                fetch("/add/", {
+                fetch("/api/add/", {
                     headers: { 
                         "X-CSRFToken": "{{csrf_token}}",
                         "user-agent": "Mozilla/4.0 MDN Example",
@@ -86,7 +97,7 @@
             }
 
             function update_(todo_id){
-                fetch("/update/"+todo_id)
+                fetch("/api/update/"+todo_id)
                 .then(function (response){
                 return response.json()
                 })
@@ -108,7 +119,7 @@
             }
 
             function delete_(todo_id){
-                fetch("/delete/"+todo_id)
+                fetch("/api/delete/"+todo_id)
                 .then(function (response){
                 return response.json()
                 })

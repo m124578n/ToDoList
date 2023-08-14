@@ -9,7 +9,6 @@ class ToDoTestCase(TestCase):
         Todo.objects.create(title="test_case_1")
         self.c = client.Client()
     
-
     def test_api(self):
         response = self.c.get("/api/")
         data = response.content.decode("utf-8")
