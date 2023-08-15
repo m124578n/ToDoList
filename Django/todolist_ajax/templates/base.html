@@ -125,7 +125,8 @@
                 })
                 .then(function (myJson) {
                     todo_id = myJson["todo_id"]
-                    document.querySelector("#all_todo"+todo_id).innerHTML = ""
+                    this_node = document.querySelector("#all_todo"+id)
+                    this_node.parentElement.removeChild(this_node)
                 })
             }
         </script>

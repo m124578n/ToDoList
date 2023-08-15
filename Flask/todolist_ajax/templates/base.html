@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo App</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+
+<body onload="get_all_list()">
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">To Do App</h1>
+
+        <form class="ui form">
+            <div class="field">
+                <label>Todo Title</label>
+                <input name="title" id="title" placeholder="Enter Todo..." value=""><br>
+            </div>
+            <button class="ui blue button" type="button" onclick=add()>Add</button>
+        </form>
+
+        <hr>
+        <div id="all">
+        </div>
+    </div>
+    <script>
+        document.onkeydown = form_sumbit
+
+        function form_sumbit(e){
+            the_event = e || window.event
+            code = the_event.keyCode || the_event.which || the_event.charCode
+            if (code == 13){
+                add()
+                return false
+            }
+            return true
+        }
+
+        function get_all_list(){
+            axios.get("http://127.0.0.1:5000/api/")
+            .then(response => {
+                response.data.data.forEach(todo => {
+                    html = ""
+                        html += '<div id="all_todo'+todo.id+'"> <div class="ui segment"> '
+                        html += '<p class="ui big header">'+todo.id+' | '+todo.title+'</p> '
+                        if (todo.complete){
+                            html += '<span class="ui green label" id="todo'+todo.id+'">Completed</span>'
+                        }
+                        else{
+                            html += '<span class="ui gray label" id="todo'+todo.id+'">Not Complete</span> '
+                        }
+                        html += '<a class="ui blue button" onclick=update_("'+todo.id+'")>Update</a> '
+                        html += '<a class="ui red button" onclick=delete_("'+todo.id+'")>Delete</a> </div></div>'
+                        document.querySelector("#all").innerHTML += html
+                });
+            })
+        }
+
+        function add(){
+            axios.post("http://127.0.0.1:5000/api/add/", {
+                "title": document.querySelector("#title").value
+            })
+            .then(response => {
+                todo_id = response.data["id"]
+                title = response.data["title"]
+                complete = response.data["complete"]
+                html = ""
+                html += '<div id="all_todo'+todo_id+'"> <div class="ui segment"> '
+                html += '<p class="ui big header">'+todo_id+' | '+title+'</p> '
+                html += '<span class="ui gray label" id="todo'+todo_id+'">Not Complete</span> '
+                html += '<a class="ui blue button" onclick=update_("'+todo_id+'")>Update</a> '
+                html += '<a class="ui red button" onclick=delete_("'+todo_id+'")>Delete</a> </div></div>'
+                document.querySelector("#all").innerHTML += html
+            })
+        }
+
+        function update_(todo_id){
+            axios.get("http://127.0.0.1:5000/api/update/"+todo_id)
+            .then(response => {
+                id = response.data["id"]
+                title = response.data["title"]
+                complete = response.data["complete"]
+                todo = document.querySelector("#todo"+id)
+                if (complete){
+                        todo.classList.remove("gray")
+                        todo.classList.add("green")
+                        todo.innerHTML = "Completed"
+                }
+                else{
+                    todo.classList.remove("green")
+                    todo.classList.add("gray")
+                    todo.innerHTML = "Not Complete"
+                }
+            })
+        }
+
+        function delete_(todo_id){
+            axios.get("http://127.0.0.1:5000/api/delete/"+todo_id)
+            .then(response => {
+                id = response.data["todo_id"]
+                this_node = document.querySelector("#all_todo"+id)
+                this_node.parentElement.removeChild(this_node)
+            })
+        }
+    </script>
+</body>
+
+</html>
