@@ -46,13 +46,13 @@
                                 }]
                             });
                         });
-                    render()
                     })
                 }
 
             // 更新 state
             function updateState(newState) {
                 state = newState;
+                render()
             }
             
             // state => UI
@@ -127,7 +127,6 @@
                             isDone: complete
                         }]
                     });
-                    render()
                 })
             });
             
@@ -140,7 +139,6 @@
                     updateState({
                         todos: state.todos = state.todos.filter(todo => todo.id !== d_id)
                     });
-                    render()
                 })
             });
             
@@ -160,7 +158,6 @@
                             }
                         })
                     })
-                    render()
                 });
             }); 
         </script>
