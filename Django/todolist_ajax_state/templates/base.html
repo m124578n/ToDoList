@@ -38,14 +38,15 @@
                 axios.get("/api/")
                     .then(response => {
                         response.data.data.forEach(todo => {
-                            updateState({
+                            state = {
                                 todos: [...state.todos, {
                                     id: todo.id,
                                     content: todo.title,
                                     isDone: todo.complete
                                 }]
-                            });
+                            }
                         });
+                        updateState(state)
                     })
                 }
 
