@@ -35,7 +35,7 @@
             }
 
             function get_all_list(){
-                axios.get("http://127.0.0.1:8000/api/")
+                axios.get("/api/")
                     .then(response => {
                         response.data.data.forEach(todo => {
                             updateState({
@@ -79,10 +79,12 @@
 
                     ${Button({
                         className: 'blue btn-update',
+                        content: 'Update'
                     })}
 
                     ${Button({
                         className: 'red btn-delete',
+                        content: 'Delete'
                     })}
 
                 </div>
@@ -96,7 +98,7 @@
             // Button component
             function Button(props) {
                 return `
-                <a class="ui ${props.className} button">Update</a>
+                <a class="ui ${props.className} button">${props.content}</a>
                 `
             }
             
@@ -105,7 +107,7 @@
                 const content = $('.input-todo').val();
                 if (!content) return;
                 $('.input-todo').val('');
-                axios.post("http://127.0.0.1:8000/api/add/", 
+                axios.post("/api/add/", 
                     {
                         "title": content
                     },
@@ -133,7 +135,7 @@
             // 刪除 todo
             $('.todos').on('click', '.btn-delete', e => {
                 const id = Number($(e.target).parents('.todo').attr('data-id'));
-                axios.get("http://127.0.0.1:8000/api/delete/"+id)
+                axios.get("/api/delete/"+id)
                 .then(response => {
                     d_id = response.data["todo_id"]
                     updateState({
@@ -145,7 +147,7 @@
             // 未完成 -> 已完成
             $('.todos').on('click', '.btn-update', e => {
                 const id = Number($(e.target).parents('.todo').attr('data-id'));
-                axios.get("http://127.0.0.1:8000/api/update/"+id)
+                axios.get("/api/update/"+id)
                 .then(response => {
                     u_id = response.data["todo_id"]
                     complete = response.data["complete"]
